@@ -1,4 +1,4 @@
------- Randomization of leader election initialization --------
+### Randomization of leader election initialization 
 
 We need to randomize the time between the cutoff timeout from hearing the
 last heartbeat to the node initializing a leader election (if a node
@@ -31,7 +31,7 @@ a new leader is elected, but the old leader comes back (resolved network partiti
 and still thinks it is the leader.
 
 
-------- Replicated state machine ---------------------
+### Replicated state machine 
 Log entries:
 * Command: the command itself (depending on what the client requested)
 * Term Number: the term in which the command was received.
@@ -70,11 +70,11 @@ Q: what happens if a client reads from a replica after a new log entry has been
 committed into the master's state but not that replica's state. Would this read
 count as incorrect?
 
------- Consensus Module ----------------
+### Consensus Module 
 
 This is what receives commands from clients
 
------ Safety --------
+### Safety 
 
 Only a server with an up-to-date log can become leader. 
 Q: How is this ensured?

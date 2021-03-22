@@ -8,3 +8,8 @@ type Node struct {
 	voteCount        int
 	isLeader         bool
 }
+
+func (*Node) SendState(nothing string, reply *string) error {
+	*reply = "YOLO"
+	return nil
+}

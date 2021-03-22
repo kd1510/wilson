@@ -80,9 +80,7 @@ func (node *Node) requestVotes() {
 		go func(peerLoc string) {
 			fmt.Printf("Node %v requesting vote from %v\n", node.identifier, peerLoc)
 			client, err := rpc.DialHTTP("tcp", fmt.Sprintf("%v:12345", peerLoc))
-			fmt.Printf("TRIED TO DIALLING %v:12345", peerLoc)
 			if err != nil {
-				panic(err)
 				fmt.Printf("Couldn't connect to peer %v\n", peerLoc)
 				wg.Done()
 				return

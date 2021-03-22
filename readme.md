@@ -1,3 +1,27 @@
+### Testing
+
+We need to be able to test various scenarios in a preferably automated way,
+which include node failure, multiple simultaneous node failures, network
+partitions, linearizability under various load situations and more.
+
+This would be hard to do manually, so setting up an automated framework is
+required. Current thought is to
+
+* Use docker to run our node processes.
+* The virtual networking layer in docker should be able to be edited during
+  a testing suite in order to simulate network partitions and test fault
+  tolerance
+* We should be able to programmatically kill and bring up one or more
+  containers simultaneously, while also providing concurrent read/writes to the
+  system. This allows us to write automated tests for different failure
+  scenarios and run them in a single command for fast iteration during
+  development and debugging.
+* We need to be able to periodically check whether the state is consistent
+  under any of these conditions.
+
+example code for designing this or solving some issue might be found in the blockade project
+(github). 
+
 ### Randomization of leader election initialization 
 
 We need to randomize the time between the cutoff timeout from hearing the

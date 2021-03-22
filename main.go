@@ -1,18 +1,18 @@
 package main
 
 import (
-	"fmt"
 	"net"
 	"net/http"
 	"net/rpc"
 	"os"
+	"strings"
 	"time"
 )
 
 func (node *Node) startServer() {
 	rpc.Register(node)
 	rpc.HandleHTTP()
-	l, e := net.Listen("tcp", fmt.Sprintf(":%v", node.portNumber))
+	l, e := net.Listen("tcp", "0.0.0.0:12345")
 	if e != nil {
 		panic("listen error:")
 	}
@@ -26,11 +26,13 @@ func check(e error) {
 }
 
 func main() {
-	portNumber := os.Args[1]
-	peerLocations := os.Args[2:]
-	node := Node{portNumber, peerLocations, 0, 0, 0, false}
+	identifier := os.Getenv("IDENTIFIER")
+	peerLocations := strings.Split(os.Getenv("PEERS"), ",")
+	node := Node{identifier, peerLocations, 0, 0, 0, false}
 
 	go node.startServer()
+
+	//Can heartbeat/elections run in different thread to the log replication?
 	go node.runTerms()
 
 	for {

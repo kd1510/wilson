@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"net/rpc"
 	"sync"
 	"time"
@@ -17,7 +18,7 @@ var voteMutex sync.Mutex
 
 //RPC Methods
 func (node *Node) ReceiveHeartbeat(master string, reply *string) error {
-	fmt.Printf("Node %v received a heartbeat from master %v\n", node.portNumber, master)
+	fmt.Printf("Node %v received a heartbeat from master %v\n", node.identifier, master)
 	heartBeatMutex.Lock()
 	node.msSinceHeartbeat = 0
 	heartBeatMutex.Unlock()
@@ -37,8 +38,8 @@ func (node *Node) SendVote(candidate string, reply *Vote) error {
 func (node *Node) sendHeartBeat() {
 	for _, peerLoc := range node.peerLocations {
 		go func(peerLoc string) {
-			fmt.Printf("Node %v sending heartbeat to %v\n", node.portNumber, peerLoc)
-			client, err := rpc.DialHTTP("tcp", fmt.Sprintf("localhost:%v", peerLoc))
+			fmt.Printf("Node %v sending heartbeat to %v\n", node.identifier, peerLoc)
+			client, err := rpc.DialHTTP("tcp", fmt.Sprintf("%v:12345", peerLoc))
 
 			if err != nil {
 				fmt.Printf("Follower %v must be down, couldn't connect\n", peerLoc)
@@ -47,7 +48,7 @@ func (node *Node) sendHeartBeat() {
 			defer client.Close()
 
 			var response string
-			err = client.Call("Node.ReceiveHeartbeat", node.portNumber, &response)
+			err = client.Call("Node.ReceiveHeartbeat", node.identifier, &response)
 			if err != nil {
 				fmt.Printf("Error sending heartbeat to follower %v\n", peerLoc)
 				return
@@ -77,9 +78,11 @@ func (node *Node) requestVotes() {
 	for _, peerLoc := range node.peerLocations {
 		wg.Add(1)
 		go func(peerLoc string) {
-			fmt.Printf("Node %v requesting vote from %v\n", node.portNumber, peerLoc)
-			client, err := rpc.DialHTTP("tcp", fmt.Sprintf("localhost:%v", peerLoc))
+			fmt.Printf("Node %v requesting vote from %v\n", node.identifier, peerLoc)
+			client, err := rpc.DialHTTP("tcp", fmt.Sprintf("%v:12345", peerLoc))
+			fmt.Printf("TRIED TO DIALLING %v:12345", peerLoc)
 			if err != nil {
+				panic(err)
 				fmt.Printf("Couldn't connect to peer %v\n", peerLoc)
 				wg.Done()
 				return
@@ -87,7 +90,7 @@ func (node *Node) requestVotes() {
 
 			defer client.Close()
 			var vote Vote
-			_ = client.Call("Node.SendVote", node.portNumber, &vote)
+			_ = client.Call("Node.SendVote", node.identifier, &vote)
 			if vote.GivenVote == true {
 				voteMutex.Lock()
 				node.voteCount++
@@ -102,7 +105,7 @@ func (node *Node) requestVotes() {
 }
 
 func (node *Node) initiateElection() {
-	fmt.Printf("%v Initiating election as reached timeout cutoff\n", node.portNumber)
+	fmt.Printf("%v Initiating election as reached timeout cutoff\n", node.identifier)
 	//If a node initiates, votes for itself
 	voteMutex.Lock()
 	node.voteCount++

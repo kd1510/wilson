@@ -1,7 +1,7 @@
 package main
 
 type Node struct {
-	portNumber       string
+	identifier       string
 	peerLocations    []string
 	currentTerm      int
 	msSinceHeartbeat int

@@ -1,0 +1,21 @@
+version: "3.3"
+services:
+    node1:
+          build:
+            context: .
+          environment:
+            - IDENTIFIER=node1
+            - PEERS=node2,node3
+    node2:
+          build:
+            context: .
+          environment:
+             - IDENTIFIER=node2
+             - PEERS=node1,node3
+    node3:
+          build:
+            context: .
+          environment:
+            - IDENTIFIER=node3
+            - PEERS=node1,node2
+

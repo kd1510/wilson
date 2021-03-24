@@ -28,7 +28,7 @@ func check(e error) {
 func main() {
 	identifier := os.Getenv("IDENTIFIER")
 	peerLocations := strings.Split(os.Getenv("PEERS"), ",")
-	node := Node{identifier, peerLocations, 0, 0, 0, false}
+	node := Node{identifier, peerLocations, make(Log, 0), 0, 0, 0, false}
 
 	go node.startServer()
 

@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"math/rand"
 	"net/rpc"
 	"sync"
 	"time"
@@ -18,7 +17,7 @@ var voteMutex sync.Mutex
 
 //RPC Methods
 func (node *Node) ReceiveHeartbeat(master string, reply *string) error {
-	fmt.Printf("Node %v received a heartbeat from master %v\n", node.identifier, master)
+	//fmt.Printf("Node %v received a heartbeat from master %v\n", node.identifier, master)
 	heartBeatMutex.Lock()
 	node.msSinceHeartbeat = 0
 	heartBeatMutex.Unlock()
@@ -38,7 +37,7 @@ func (node *Node) SendVote(candidate string, reply *Vote) error {
 func (node *Node) sendHeartBeat() {
 	for _, peerLoc := range node.peerLocations {
 		go func(peerLoc string) {
-			fmt.Printf("Node %v sending heartbeat to %v\n", node.identifier, peerLoc)
+			//fmt.Printf("Node %v sending heartbeat to %v\n", node.identifier, peerLoc)
 			client, err := rpc.DialHTTP("tcp", fmt.Sprintf("%v:12345", peerLoc))
 
 			if err != nil {
@@ -121,29 +120,4 @@ func (node *Node) initiateElection() {
 		node.voteCount = 0
 	}
 	voteMutex.Unlock()
-}
-
-func (node *Node) runTerms() {
-	for {
-		fmt.Printf("Term: %v |||  Is Leader: %v ||| \n", node.currentTerm, node.isLeader)
-
-		if node.isLeader == true {
-
-			//Start sending out heartbeat to all followers
-			node.sendHeartBeat()
-			time.Sleep(time.Millisecond * 500)
-
-		} else {
-
-			//Check if we need to initiate a leader election
-			rand.Seed(time.Now().UTC().UnixNano())
-			cutoff := rand.Intn(1000) + 2000 //from 150 to 300ms
-			node.heartbeatTimeout(cutoff)
-			node.currentTerm++
-
-			heartBeatMutex.Lock()
-			node.msSinceHeartbeat = 0
-			heartBeatMutex.Unlock()
-		}
-	}
 }

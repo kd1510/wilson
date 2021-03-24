@@ -47,7 +47,6 @@ A: What we can do in this situation is just wait for another timeout (as each
   term's timeout is randomized per node), and eventually there will be a round
   in which a single node times out first.
 
-
 What about partial failure of a leader?
 
 I've seen that a leader can go down temporarily, a new election happens and
@@ -93,6 +92,9 @@ although the uncommitted entries will be lost (?)
 Q: what happens if a client reads from a replica after a new log entry has been
 committed into the master's state but not that replica's state. Would this read
 count as incorrect?
+
+A: Without an additional layer (e.g what zookeeper provides), reading is only
+allowed from the master.
 
 ### Consensus Module 
 

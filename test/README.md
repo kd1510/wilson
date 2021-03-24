@@ -14,7 +14,7 @@ a JSON of the current state of a node. This can be used in automating scenarios
 by for instance:
 
 
-####Leader election scenario
+#### Leader election scenario
 - Starting the cluster
 - Killing the leader
 - Checking the state of both remaining containers until a new leader is elected
